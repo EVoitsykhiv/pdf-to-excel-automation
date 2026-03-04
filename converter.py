@@ -12,7 +12,8 @@ def extract_tables(pdf_path):
 
             extracted = page.extract_table()
 
-            if extracted:
+            if extracted and len(extracted) > 1:
+
                 df = pd.DataFrame(extracted[1:], columns=extracted[0])
                 tables.append(df)
 
@@ -21,8 +22,8 @@ def extract_tables(pdf_path):
 
 def save_to_excel(tables, output_file):
 
-    with pd.ExcelWriter(output_file) as writer:
+    with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
 
         for i, table in enumerate(tables):
 
-            table.to_excel(writer, sheet_name=f"table_{i}", index=False)
+            table.to_excel(writer, sheet_name=f"table_{i+1}", index=False)
