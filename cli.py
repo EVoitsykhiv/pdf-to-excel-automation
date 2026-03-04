@@ -3,42 +3,58 @@ import sys
 import logging
 from converter import extract_tables, save_to_excel
 
+
 logging.basicConfig(
     filename="converter.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-if len(sys.argv) < 2:
-    print("Usage: python cli.py <pdf_folder>")
-    sys.exit()
 
-folder = sys.argv[1]
+def main():
 
-all_tables = []
+    if len(sys.argv) < 2:
+        print("Usage: python cli.py <pdf_folder>")
+        sys.exit()
 
-for file in os.listdir(folder):
+    folder = sys.argv[1]
 
-    if file.endswith(".pdf"):
+    if not os.path.exists(folder):
+        print("Folder not found")
+        sys.exit()
 
-        path = os.path.join(folder, file)
+    all_tables = []
 
-        print(f"Processing {file}...")
-        logging.info(f"Processing {file}")
+    for file in os.listdir(folder):
 
-        try:
-            tables = extract_tables(path)
-            all_tables.extend(tables)
+        if file.endswith(".pdf"):
 
-        except Exception as e:
-            print(f"Error processing {file}: {e}")
-            logging.error(f"Error processing {file}: {e}")
+            path = os.path.join(folder, file)
 
-if not all_tables:
-    print("No tables found")
-    sys.exit()
+            print(f"Processing {file}...")
+            logging.info(f"Processing {file}")
 
-save_to_excel(all_tables, "output.xlsx")
+            try:
 
-print("Saved data to output.xlsx")
-logging.info("Saved data to output.xlsx")
+                tables = extract_tables(path)
+                all_tables.extend(tables)
+
+            except Exception as e:
+
+                print(f"Error processing {file}: {e}")
+                logging.error(f"Error processing {file}: {e}")
+
+    if not all_tables:
+
+        print("No tables found")
+        logging.warning("No tables extracted")
+        sys.exit()
+
+    save_to_excel(all_tables, "output.xlsx")
+
+    print("Saved data to output.xlsx")
+    logging.info("Excel file created")
+
+
+if __name__ == "__main__":
+    main()
